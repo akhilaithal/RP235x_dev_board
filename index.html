@@ -35,7 +35,7 @@
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x222222);
 
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 1000);
         camera.position.set(0, 1, 2);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -59,41 +59,33 @@
 
         // --- 4. LOAD THE GLB MODEL ---
         const loader = new GLTFLoader();
-        
-        // REPLACE 'model.glb' WITH YOUR FILENAME
-        loader.load('RP235x_60QFN.glb', 
-            (gltf) => {
-                const model = gltf.scene;
-                scene.add(model);
-                document.getElementById('loading').style.display = 'none';
-                
-                // Center the model automatically
-                const box = new THREE.Box3().setFromObject(model);
-                const center = box.getCenter(new THREE.Vector3());
-                model.position.sub(center); 
-            },
-            (xhr) => {
-                console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-            },
-            (error) => {
-                console.error('An error happened', error);
-                document.getElementById('loading').innerText = 'Error loading model';
-            }
-        );
+loader.load('model.glb', (gltf) => {
+    const model = gltf.scene;
+    scene.add(model);
+    document.getElementById('loading').style.display = 'none';
 
-        // --- 5. ANIMATION LOOP ---
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.render(scene, camera);
-        }
+    // Calculate the size of your model
+    const box = new THREE.Box3().setFromObject(model);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
 
-        // --- 6. HANDLE WINDOW RESIZE ---
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+    // Center the model
+    model.position.x += (model.position.x - center.x);
+    model.position.y += (model.position.y - center.y);
+    model.position.z += (model.position.z - center.z);
+
+    // AUTO-ZOOM: Adjust camera distance based on model size
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const fov = camera.fov * (Math.PI / 180);
+    let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+    
+    cameraZ *= 1.5; // Add some padding so it's not touching the edges
+    camera.position.z = cameraZ;
+
+    // Update controls to look at the center
+    controls.target.set(0, 0, 0);
+    controls.update();
+});      
 
         animate();
     </script>
