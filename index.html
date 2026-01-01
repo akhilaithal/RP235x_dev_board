@@ -59,42 +59,42 @@
 
         // --- 4. LOAD THE GLB MODEL ---
         const loader = new GLTFLoader();
-loader.load('model.glb', (gltf) => {
-   const model = gltf.scene;
-    
-    // 1. Manually scale up if the model is microscopic
-    // If your model is 1mm tall, it will be invisible. Try 10 or 100.
-    // model.scale.set(10, 10, 10); 
-
-    scene.add(model);
-    document.getElementById('loading').style.display = 'none';
-
-    // 2. Calculate the exact bounding box
-    const box = new THREE.Box3().setFromObject(model);
-    const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-
-    // 3. Re-center the model so OrbitControls rotates around its middle
-    model.position.x += (model.position.x - center.x);
-    model.position.y += (model.position.y - center.y);
-    model.position.z += (model.position.z - center.z);
-
-    // 4. Force the camera to look at the model
-    const maxDim = Math.max(size.x, size.y, size.z);
-    
-    // This formula calculates the distance needed to fit the object in view
-    const fov = camera.fov * (Math.PI / 180);
-    let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-
-    // multiplier (0.8 = very close, 1.5 = comfortable distance)
-    camera.position.z = cameraZ * 1.2; 
-    
-    // Ensure the camera doesn't clip through the near plane
-    camera.updateProjectionMatrix();
-    
-    controls.target.set(0, 0, 0);
-    controls.update();
-});
+        loader.load('RP235x_60QFN.glb', (gltf) => {
+           const model = gltf.scene;
+            
+            // 1. Manually scale up if the model is microscopic
+            // If your model is 1mm tall, it will be invisible. Try 10 or 100.
+            // model.scale.set(10, 10, 10); 
+        
+            scene.add(model);
+            document.getElementById('loading').style.display = 'none';
+        
+            // 2. Calculate the exact bounding box
+            const box = new THREE.Box3().setFromObject(model);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+        
+            // 3. Re-center the model so OrbitControls rotates around its middle
+            model.position.x += (model.position.x - center.x);
+            model.position.y += (model.position.y - center.y);
+            model.position.z += (model.position.z - center.z);
+        
+            // 4. Force the camera to look at the model
+            const maxDim = Math.max(size.x, size.y, size.z);
+            
+            // This formula calculates the distance needed to fit the object in view
+            const fov = camera.fov * (Math.PI / 180);
+            let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+        
+            // multiplier (0.8 = very close, 1.5 = comfortable distance)
+            camera.position.z = cameraZ * 1.2; 
+            
+            // Ensure the camera doesn't clip through the near plane
+            camera.updateProjectionMatrix();
+            
+            controls.target.set(0, 0, 0);
+            controls.update();
+        });
         animate();
     </script>
 </body>
